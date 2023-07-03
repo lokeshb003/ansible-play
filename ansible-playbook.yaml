@@ -9,30 +9,21 @@
       shell: yum update
       when: ansible_distribution == 'CentOS'
     - name: "Install Tomcat server in Ubuntu"
-      apt:
-        name: tomcat*
-        state: present
-      when: ansible_distribution == 'Ubuntu'
-    - name: "Install Tomcat server in centos"
-      yum:
-        name: tomcat*
-        state: present
-      when: ansible_distribution == 'CentOS'
+      shell: |
+        cd /root
+        wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.76/bin/apache-tomcat-9.0.76.tar.gz
+        tar -xvzf apache-tomcat-9.0.76.tar.gz
+        cd apache-tomcat-9.0.76/bin
+        bash startup.sh
     - name: 'Clone the git repository'
-      when: ansible_distribution == 'Ubuntu'
       shell: |
-        apt install git openjdk-11-jdk maven -y
+        cd /root
         git clone https://github.com/lokeshb003/Petclinic
         cd Petclinic
         mvn clean package -DskipTests=true
-        cp target/petclinic.war /usr/share/tomcat/webapps
-    - name: 'Clone the git repository in Centos'
+        cp target/petclinic.war /root/apache-tomcat-9.0.76/webapps
+    - name: 'reboot the tomcat server'
       shell: |
-        yum install git openjdk-11-jdk maven -y
-        git clone https://github.com/lokeshb003/Petclinic
-        cd Petclinic
-        mvn clean package -DskipTests=true
-        cp target/petclinic.war /usr/share/tomcat/webapps
-    - name: 'Start the Tomcat server'
-      shell: systemctl enable tomcat && systemctl start tomcat
-
+        cd /root/apache-tomcat-9.0.76/bin
+        bash shutdown.sh
+        bash startup.sh
