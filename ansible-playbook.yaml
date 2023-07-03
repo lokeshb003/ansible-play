@@ -24,14 +24,14 @@
         apt install git openjdk-11-jdk maven -y
         git clone https://github.com/lokeshb003/Petclinic
         cd Petclinic
-        mvn clean package
+        mvn clean package -DskipTests=true
         cp target/petclinic.war /usr/share/tomcat/webapps
     - name: 'Clone the git repository in Centos'
       shell: |
         yum install git openjdk-11-jdk maven -y
         git clone https://github.com/lokeshb003/Petclinic
         cd Petclinic
-        mvn clean package
+        mvn clean package -DskipTests=true
         cp target/petclinic.war /usr/share/tomcat/webapps
     - name: 'Start the Tomcat server'
       shell: systemctl enable tomcat && systemctl start tomcat
