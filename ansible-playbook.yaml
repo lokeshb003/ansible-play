@@ -1,0 +1,37 @@
+name: "Ansible Playbook to deploy Springboot application"
+hosts: localhost
+tasks:
+  - name: "Update the packages with package repository"
+    shell: apt update && apt upgrade -y
+    when: ansible_distribution == 'Ubuntu'
+  - name: "Update the packages with package repository when centos"
+    shell: yum update
+    when: ansible_distribution == 'CentOS'
+  - name: "Install Tomcat server in Ubuntu"
+    apt:
+      name: tomcat*
+      state: present
+    when: ansible_distribution == 'Ubuntu'
+  - name: "Install Tomcat server in centos"
+    yum:
+      name: tomcat*
+      state: present
+    when: ansible_distribution == 'CentOS'
+  - name: 'Clone the git repository'
+    when: ansible_distribution == 'Ubuntu'
+    shell: |
+    apt install git openjdk-11-jdk maven -y
+    git clone https://github.com/lokeshb003/Petclinic
+    cd Petclinic
+    mvn clean package
+    cp target/petclinic.war /usr/share/tomcat/webapps
+  - name: 'Clone the git repository in Centos'
+    shell: |
+    yum install git openjdk-11-jdk maven -y
+    git clone https://github.com/lokeshb003/Petclinic
+    cd Petclinic
+    mvn clean package
+    cp target/petclinic.war /usr/share/tomcat/webapps
+  - name: 'Start the Tomcat server'
+    shell: systemctl enable tomcat && systemctl start tomcat
+
